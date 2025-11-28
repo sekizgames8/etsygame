@@ -62,10 +62,6 @@ export default function GamesPage() {
       await axios.delete(`${API_BASE_URL}/api/admin/games/${gameId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (selectedGame?.id === gameId) {
-        setSelectedGame(null);
-        setSelectedUsers([]);
-      }
       fetchGames();
     } catch (e) {
       console.error(e);
