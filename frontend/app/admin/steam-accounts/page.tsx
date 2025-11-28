@@ -139,7 +139,7 @@ export default function SteamAccountsPage() {
                   <td className="px-4 py-2 text-right">
                     <Button
                       type="button"
-                      variant="destructive"
+                      variant="danger"
                       className="text-xs px-3 py-1.5"
                       onClick={() => handleDelete(acc.id)}
                       disabled={!!deleting[acc.id]}
