@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Çevre değişkeninde sorun yaşadığın için bağlantı adresini doğrudan buraya yazıyoruz.
+  // İleride istersen tekrar env("DATABASE_URL") yapabilirsin.
+  url      = "postgresql://neondb_owner:npg_9xS5WbsjVUPE@ep-ancient-thunder-agkipirh-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignments Assignment[]
+  codeRequests CodeRequest[]
+}
+
+model Game {
+  id         String   @id @default(uuid())
+  title      String
+  coverImage String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  accounts SteamAccount[]
+  codeRequests CodeRequest[]
+}
+
+model SteamAccount {
+  id                String   @id @default(uuid())
+  username          String
+  password          String   // Encrypted
+  sharedSecret      String?  
+  gmailEmail        String
+  gmailRefreshToken String   // Encrypted
+  
+  gameId            String
+  game              Game     @relation(fields: [gameId], references: [id])
+
+  assignments       Assignment[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Assignment {
+  id             String       @id @default(uuid())
+  userId         String
+  steamAccountId String
+  user           User         @relation(fields: [userId], references: [id])
+  steamAccount   SteamAccount @relation(fields: [steamAccountId], references: [id])
+  
+  createdAt      DateTime     @default(now())
+
+  @@unique([userId, steamAccountId])
+}
+
+model CodeRequest {
+  id        String   @id @default(uuid())
+  userId    String
+  gameId    String
+
+  user      User    @relation(fields: [userId], references: [id])
+  game      Game    @relation(fields: [gameId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, gameId, createdAt])
+}
