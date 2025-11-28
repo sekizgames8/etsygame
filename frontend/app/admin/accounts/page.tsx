@@ -17,7 +17,7 @@ export default function AccountsPage() {
   const [showEditPassword, setShowEditPassword] = useState(false);
 
   const fetchData = async () => {
-    const token = localStorage.getItem(\"token\");
+    const token = localStorage.getItem("token");
     try {
       const [dashRes, detailRes] = await Promise.all([
         axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
@@ -40,7 +40,7 @@ export default function AccountsPage() {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem(\"token\");
+    const token = localStorage.getItem("token");
     try {
       await axios.post(`${API_BASE_URL}/api/admin/accounts`, formData, {
         headers: { Authorization: `Bearer ${token}` }
@@ -52,7 +52,7 @@ export default function AccountsPage() {
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    const token = localStorage.getItem(\"token\");
+    const token = localStorage.getItem("token");
     try {
       await axios.put(`${API_BASE_URL}/api/admin/accounts/${editingId}`, {
         username: editValues.username,

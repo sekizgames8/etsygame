@@ -10,7 +10,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem(\"token\");
+      const token = localStorage.getItem("token");
       try {
         const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
           headers: { Authorization: `Bearer ${token}` }
