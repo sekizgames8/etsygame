@@ -1,7 +1,7 @@
-\"use client\";
-import { useEffect, useState } from \"react\";
-import axios from \"axios\";
-import { API_BASE_URL } from \"@/lib/utils\";
+"use client";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { API_BASE_URL } from "@/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Users, Gamepad2, Key } from "lucide-react";
 
