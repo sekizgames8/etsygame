@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "@/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 
@@ -28,7 +29,7 @@ export default function AssignmentsPage() {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.get<DashboardData>(
-        "http://localhost:3001/api/admin/dashboard-data",
+        `${API_BASE_URL}/api/admin/dashboard-data`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -49,7 +50,7 @@ export default function AssignmentsPage() {
     setLoading(true);
     try {
       await axios.post(
-        "http://localhost:3001/api/admin/assign",
+        `${API_BASE_URL}/api/admin/assign`,
         assignData,
         {
           headers: { Authorization: `Bearer ${token}` },

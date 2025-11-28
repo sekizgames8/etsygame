@@ -1,5 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Render (Linux) üzerinde çalışabilmek için ek binary target
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {

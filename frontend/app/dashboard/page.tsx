@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { io, Socket } from "socket.io-client";
 import axios from "axios";
+import { API_BASE_URL } from "@/lib/utils";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { useLang } from "@/lib/lang";
@@ -44,7 +45,7 @@ export default function Dashboard() {
     setUser(userData);
 
     // Fetch Games
-    axios.get("http://localhost:3001/api/code/my-games", {
+    axios.get(`${API_BASE_URL}/api/code/my-games`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setGames(res.data);
@@ -54,7 +55,7 @@ export default function Dashboard() {
     });
 
     // Connect Socket
-    const newSocket = io("http://localhost:3001");
+    const newSocket = io(API_BASE_URL);
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -87,7 +88,7 @@ export default function Dashboard() {
         [gameId]: { status: 'QUEUED' }
       }));
 
-      await axios.post("http://localhost:3001/api/code/request", { gameId }, {
+      await axios.post(`${API_BASE_URL}/api/code/request`, { gameId }, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (err: any) {

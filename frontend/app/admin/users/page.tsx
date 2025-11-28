@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { API_BASE_URL } from "@/lib/utils";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -12,7 +13,7 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("http://localhost:3001/api/admin/dashboard-data", {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data.users);
@@ -25,7 +26,7 @@ export default function UsersPage() {
     e.preventDefault();
     const token = localStorage.getItem("token");
     try {
-      await axios.post("http://localhost:3001/api/admin/users", formData, {
+      await axios.post(`${API_BASE_URL}/api/admin/users`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowForm(false);
@@ -37,7 +38,7 @@ export default function UsersPage() {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost:3001/api/admin/users/${userId}/active`,
+        `${API_BASE_URL}/api/admin/users/${userId}/active`,
         { isActive: !current },
         { headers: { Authorization: `Bearer ${token}` } }
       );

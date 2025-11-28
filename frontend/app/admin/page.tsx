@@ -1,6 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
-import axios from "axios";
+\"use client\";
+import { useEffect, useState } from \"react\";
+import axios from \"axios\";
+import { API_BASE_URL } from \"@/lib/utils\";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Users, Gamepad2, Key } from "lucide-react";
 
@@ -9,9 +10,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem(\"token\");
       try {
-        const res = await axios.get("http://localhost:3001/api/admin/dashboard-data", {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats({

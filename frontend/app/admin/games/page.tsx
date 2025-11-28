@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/Button";
 import { Trash2, Pencil } from "lucide-react";
+import { API_BASE_URL } from "@/lib/utils";
 
 export default function GamesPage() {
   const [games, setGames] = useState<any[]>([]);
@@ -13,7 +14,7 @@ export default function GamesPage() {
   const fetchGames = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get("http://localhost:3001/api/admin/dashboard-data", {
+      const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setGames(res.data.games);
@@ -28,14 +29,14 @@ export default function GamesPage() {
     try {
       if (editingGame) {
         await axios.put(
-          `http://localhost:3001/api/admin/games/${editingGame.id}`,
+          `${API_BASE_URL}/api/admin/games/${editingGame.id}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
       } else {
-        await axios.post("http://localhost:3001/api/admin/games", formData, {
+        await axios.post(`${API_BASE_URL}/api/admin/games`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
       }
@@ -58,7 +59,7 @@ export default function GamesPage() {
 
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:3001/api/admin/games/${gameId}`, {
+      await axios.delete(`${API_BASE_URL}/api/admin/games/${gameId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (selectedGame?.id === gameId) {

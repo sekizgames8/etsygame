@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { API_BASE_URL } from "@/lib/utils";
 
 interface SteamAccountRow {
   id: string;
@@ -23,7 +24,7 @@ export default function SteamAccountsPage() {
       const token = localStorage.getItem("token");
       try {
         const res = await axios.get<SteamAccountRow[]>(
-          "http://localhost:3001/api/admin/steam-accounts-detail",
+          `${API_BASE_URL}/api/admin/steam-accounts-detail`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -59,7 +60,7 @@ export default function SteamAccountsPage() {
 
     try {
       setDeleting((prev) => ({ ...prev, [id]: true }));
-      await axios.delete(`http://localhost:3001/api/admin/accounts/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/admin/accounts/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRows((prev) => prev.filter((r) => r.id !== id));

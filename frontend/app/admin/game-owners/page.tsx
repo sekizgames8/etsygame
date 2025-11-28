@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
+import { API_BASE_URL } from "@/lib/utils";
 
 interface Game {
   id: string;
@@ -21,7 +22,7 @@ export default function GameOwnersPage() {
     const fetchGames = async () => {
       const token = localStorage.getItem("token");
       try {
-        const res = await axios.get("http://localhost:3001/api/admin/dashboard-data", {
+        const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setGames(res.data.games || []);
@@ -44,7 +45,7 @@ export default function GameOwnersPage() {
     setLoadingOwners(true);
     try {
       const res = await axios.get(
-        `http://localhost:3001/api/admin/games/${game.id}/users`,
+        `${API_BASE_URL}/api/admin/games/${game.id}/users`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -62,7 +63,7 @@ export default function GameOwnersPage() {
     const token = localStorage.getItem("token");
     try {
       await axios.patch(
-        `http://localhost:3001/api/admin/users/${userId}/active`,
+        `${API_BASE_URL}/api/admin/users/${userId}/active`,
         { isActive: !isActive },
         { headers: { Authorization: `Bearer ${token}` } }
       );

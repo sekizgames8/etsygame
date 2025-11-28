@@ -1,6 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
-import axios from "axios";
+\"use client\";
+import { useEffect, useState } from \"react\";
+import axios from \"axios\";
+import { API_BASE_URL } from \"@/lib/utils\";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 
@@ -16,13 +17,13 @@ export default function AccountsPage() {
   const [showEditPassword, setShowEditPassword] = useState(false);
 
   const fetchData = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(\"token\");
     try {
       const [dashRes, detailRes] = await Promise.all([
-        axios.get("http://localhost:3001/api/admin/dashboard-data", {
+        axios.get(`${API_BASE_URL}/api/admin/dashboard-data`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        axios.get("http://localhost:3001/api/admin/steam-accounts-detail", {
+        axios.get(`${API_BASE_URL}/api/admin/steam-accounts-detail`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -39,9 +40,9 @@ export default function AccountsPage() {
 
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(\"token\");
     try {
-      await axios.post("http://localhost:3001/api/admin/accounts", formData, {
+      await axios.post(`${API_BASE_URL}/api/admin/accounts`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setShowForm(false);
@@ -51,9 +52,9 @@ export default function AccountsPage() {
 
   const handleSaveEdit = async () => {
     if (!editingId) return;
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(\"token\");
     try {
-      await axios.put(`http://localhost:3001/api/admin/accounts/${editingId}`, {
+      await axios.put(`${API_BASE_URL}/api/admin/accounts/${editingId}`, {
         username: editValues.username,
         gmailEmail: editValues.gmailEmail,
         password: editValues.password,
