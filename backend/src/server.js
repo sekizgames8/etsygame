@@ -13,6 +13,41 @@ const codeRoutes = require('./routes/code');
 const app = express();
 const server = http.createServer(app);
 
+function safeLogConnectionInfo() {
+  try {
+    const dbUrl = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
+    if (dbUrl) {
+      console.log('[DB]', {
+        host: dbUrl.hostname,
+        port: dbUrl.port || '5432',
+        db: dbUrl.pathname?.replace('/', '') || '<unknown>',
+        search: dbUrl.search ? '[set]' : '[empty]',
+      });
+    } else {
+      console.warn('[DB] DATABASE_URL is not set');
+    }
+  } catch (e) {
+    console.warn('[DB] Failed to parse DATABASE_URL');
+  }
+
+  try {
+    const redisUrl = process.env.REDIS_URL ? new URL(process.env.REDIS_URL) : null;
+    if (redisUrl) {
+      console.log('[REDIS]', {
+        host: redisUrl.hostname,
+        port: redisUrl.port || '<unknown>',
+        tls: redisUrl.protocol === 'rediss:' ? 'enabled' : 'disabled',
+      });
+    } else {
+      console.warn('[REDIS] REDIS_URL is not set');
+    }
+  } catch (e) {
+    console.warn('[REDIS] Failed to parse REDIS_URL');
+  }
+}
+
+safeLogConnectionInfo();
+
 // Rate Limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -50,6 +85,37 @@ const io = new Server(server, {
 });
 
 app.use(express.json());
+
+// Health check (DB + Redis connectivity)
+app.get('/api/health', async (req, res) => {
+  const out = {
+    ok: true,
+    db: { ok: false },
+    redis: { ok: false },
+    time: new Date().toISOString(),
+  };
+
+  try {
+    // Lazy import to avoid circular deps; prisma client is a singleton in ../lib/prisma
+    const prisma = require('./lib/prisma');
+    await prisma.$queryRaw`SELECT 1`;
+    out.db.ok = true;
+  } catch (e) {
+    out.ok = false;
+    out.db.error = e?.code || e?.name || 'DB_ERROR';
+  }
+
+  try {
+    // BullMQ ioredis connection
+    await connection.ping();
+    out.redis.ok = true;
+  } catch (e) {
+    out.ok = false;
+    out.redis.error = e?.name || 'REDIS_ERROR';
+  }
+
+  res.status(out.ok ? 200 : 503).json(out);
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
