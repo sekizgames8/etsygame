@@ -23,11 +23,10 @@ async function main() {
   console.log('Admin user:', admin.email);
 
   // 2) Ortak Gmail refresh token (tüm Steam hesapları için aynı olacak)
-  const defaultGmailRefreshToken =
-  process.env.DEFAULT_GMAIL_REFRESH_TOKEN ||
-  "1//04nsc1ESt-s9bCgYIARAAGAQSNwF-L9IrNlzoCmQAzITSV5S_BNfs5T076zIUPRmspMSh5TlRhViY3-CZbZxXOzJJtcILxS5UJfU";  if (!defaultGmailRefreshToken) {
+  const defaultGmailRefreshToken = process.env.DEFAULT_GMAIL_REFRESH_TOKEN;
+  if (!defaultGmailRefreshToken) {
     throw new Error(
-      'DEFAULT_GMAIL_REFRESH_TOKEN env değişkeni yok. Lütfen .env dosyasında Google refresh tokenını DEFAULT_GMAIL_REFRESH_TOKEN olarak ekleyin.'
+      'DEFAULT_GMAIL_REFRESH_TOKEN environment variable is required. Please set it in your .env file.'
     );
   }
   const encryptedGmailToken = encrypt(defaultGmailRefreshToken);

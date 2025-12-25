@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const helmet = require('helmet');
 const dns = require('dns');
 const net = require('net');
 const rateLimit = require('express-rate-limit');
@@ -59,6 +60,19 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again after 15 minutes',
 });
 
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Socket.IO needs this
+}));
+
 // Apply rate limiting to all requests
 app.use(limiter);
 
@@ -86,7 +100,19 @@ const io = new Server(server, {
   }
 });
 
-app.use(express.json());
+// Body parser with size limit
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({ 
+    error: process.env.NODE_ENV === 'production' 
+      ? 'An error occurred' 
+      : err.message 
+  });
+});
 
 // Health check (DB + Redis connectivity)
 app.get('/api/health', async (req, res) => {

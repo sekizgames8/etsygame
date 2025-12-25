@@ -12,33 +12,71 @@ router.use(isAdmin);
 // Create User
 router.post('/users', async (req, res) => {
   const { email, password, name, role, isActive } = req.body;
+  
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format.' });
+  }
+  
+  if (password.length < 6 || password.length > 128) {
+    return res.status(400).json({ error: 'Password must be between 6 and 128 characters.' });
+  }
+  
+  if (role && !['USER', 'ADMIN'].includes(role)) {
+    return res.status(400).json({ error: 'Invalid role. Must be USER or ADMIN.' });
+  }
+  
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
       data: { 
-        email, 
+        email: email.toLowerCase().trim(), 
         password: hashedPassword, 
-        name, 
+        name: name?.trim() || null, 
         role: role || 'USER',
         isActive: typeof isActive === 'boolean' ? isActive : true,
       }
     });
-    res.json(user);
+    // Don't send password back
+    const { password: _, ...userWithoutPassword } = user;
+    res.json(userWithoutPassword);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    if (error.code === 'P2002') {
+      return res.status(409).json({ error: 'User with this email already exists.' });
+    }
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user.' });
   }
 });
 
 // Create Game
 router.post('/games', async (req, res) => {
   const { title, coverImage } = req.body;
+  
+  if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    return res.status(400).json({ error: 'Title is required and must be a non-empty string.' });
+  }
+  
+  if (title.length > 200) {
+    return res.status(400).json({ error: 'Title must be less than 200 characters.' });
+  }
+  
   try {
     const game = await prisma.game.create({
-      data: { title, coverImage }
+      data: { 
+        title: title.trim(), 
+        coverImage: coverImage?.trim() || `https://placehold.co/300x450?text=${encodeURIComponent(title.trim())}`
+      }
     });
     res.json(game);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error creating game:', error);
+    res.status(500).json({ error: 'Failed to create game.' });
   }
 });
 
