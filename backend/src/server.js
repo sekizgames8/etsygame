@@ -102,7 +102,13 @@ app.get('/api/health', async (req, res) => {
     out.db.ok = true;
   } catch (e) {
     out.ok = false;
-    out.db.error = e?.code || e?.name || 'DB_ERROR';
+    out.db.error = {
+      name: e?.name || 'DB_ERROR',
+      code: e?.code || e?.errorCode || undefined,
+      // Keep message short and avoid leaking anything sensitive
+      message: typeof e?.message === 'string' ? e.message.split('\n')[0].slice(0, 300) : undefined,
+    };
+    console.error('[HEALTH][DB]', out.db.error);
   }
 
   try {
@@ -111,7 +117,12 @@ app.get('/api/health', async (req, res) => {
     out.redis.ok = true;
   } catch (e) {
     out.ok = false;
-    out.redis.error = e?.name || 'REDIS_ERROR';
+    out.redis.error = {
+      name: e?.name || 'REDIS_ERROR',
+      code: e?.code || undefined,
+      message: typeof e?.message === 'string' ? e.message.split('\n')[0].slice(0, 300) : undefined,
+    };
+    console.error('[HEALTH][REDIS]', out.redis.error);
   }
 
   res.status(out.ok ? 200 : 503).json(out);
