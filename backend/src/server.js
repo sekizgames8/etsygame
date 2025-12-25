@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const dns = require('dns');
 const rateLimit = require('express-rate-limit');
 const { codeQueue, connection } = require('./worker/queue');
 const { QueueEvents } = require('bullmq');
@@ -95,6 +96,23 @@ app.get('/api/health', async (req, res) => {
     time: new Date().toISOString(),
   };
 
+  // DNS check for DB host (helps distinguish DNS/network issues)
+  try {
+    const dbUrl = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
+    if (dbUrl?.hostname) {
+      const lookup = await dns.promises.lookup(dbUrl.hostname);
+      out.db.dns = { ok: true, address: lookup.address, family: lookup.family, host: dbUrl.hostname };
+    } else {
+      out.db.dns = { ok: false, error: 'DATABASE_URL_NOT_SET' };
+    }
+  } catch (e) {
+    out.ok = false;
+    out.db.dns = {
+      ok: false,
+      error: e?.code || e?.name || 'DNS_LOOKUP_FAILED',
+    };
+  }
+
   try {
     // Lazy import to avoid circular deps; prisma client is a singleton in ../lib/prisma
     const prisma = require('./lib/prisma');
@@ -102,11 +120,18 @@ app.get('/api/health', async (req, res) => {
     out.db.ok = true;
   } catch (e) {
     out.ok = false;
+    const msgLines =
+      typeof e?.message === 'string'
+        ? e.message
+            .split('\n')
+            .map((l) => l.trim())
+            .filter(Boolean)
+        : [];
     out.db.error = {
       name: e?.name || 'DB_ERROR',
       code: e?.code || e?.errorCode || undefined,
       // Keep message short and avoid leaking anything sensitive
-      message: typeof e?.message === 'string' ? e.message.split('\n')[0].slice(0, 300) : undefined,
+      message: (msgLines[0] || e?.toString?.() || '').slice(0, 300),
     };
     console.error('[HEALTH][DB]', out.db.error);
   }
