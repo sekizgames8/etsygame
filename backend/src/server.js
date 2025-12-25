@@ -3,14 +3,26 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const { codeQueue, connection } = require('./worker/queue');
 const { QueueEvents } = require('bullmq');
-const authRoutes = require('./routes/auth');
-const adminRoutes = require('./routes/admin');
-const codeRoutes = require('./routes/code'); // To trigger the job
+
+// ... imports ...
 
 const app = express();
 const server = http.createServer(app);
+
+// Rate Limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: 'Too many requests from this IP, please try again after 15 minutes',
+});
+
+// Apply rate limiting to all requests
+app.use(limiter);
 
 // Configure CORS for Express
 app.use(cors({

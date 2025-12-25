@@ -15,7 +15,7 @@ console.log("GMAIL_CLIENT_SECRET set:", GMAIL_CLIENT_SECRET !== "PASTE_GOOGLE_CL
 
 // Only Gmail polling – no automatic Steam login.
 // targetEmail: Steam hesabında kullanılan Gmail adresi (alias dahil)
-async function fetchCodeFromGmail(auth, targetEmail, retries = 10) {
+async function fetchCodeFromGmail(auth, targetEmail, retries = 5) {
   const gmail = google.gmail({ version: 'v1', auth });
 
   for (let i = 0; i < retries; i++) {
@@ -25,8 +25,8 @@ async function fetchCodeFromGmail(auth, targetEmail, retries = 10) {
         // Steam'den gelen son birkaç maili ara
         // (to: filtresi bazı durumlarda Gmail aramasında sorun çıkarabildiği için
         //  burada sadece from ile daraltıyoruz, eşleştirmeyi aşağıda kendimiz yapıyoruz)
-        q: `from:noreply@steampowered.com`,
-        maxResults: 5,
+        q: `from:noreply@steampowered.com is:unread subject:"Steam Guard"`,
+        maxResults: 1,
       });
 
       if (res.data.messages && res.data.messages.length > 0) {
@@ -78,8 +78,8 @@ async function fetchCodeFromGmail(auth, targetEmail, retries = 10) {
       }
     }
 
-    // 2 saniye bekle, tekrar dene
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // 5 saniye bekle, tekrar dene (Redis limitlerini korumak için artırıldı)
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 
   throw new Error("Code not found in email after retries");

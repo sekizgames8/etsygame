@@ -5,7 +5,18 @@ const connection = new IORedis(process.env.REDIS_URL || 'rediss://default:AZDAAA
   maxRetriesPerRequest: null,
 });
 
-const codeQueue = new Queue('steam-codes', { connection });
+const codeQueue = new Queue('steam-codes', { 
+  connection,
+  defaultJobOptions: {
+    attempts: 3, // En fazla 3 kere dene
+    backoff: {
+      type: 'exponential',
+      delay: 5000, // İlk hatadan sonra 5sn bekle, sonra katlayarak artır
+    },
+    removeOnComplete: true, // Başarılı işleri Redis'ten sil (yer kaplamasın)
+    removeOnFail: 100, // Sadece son 100 başarısız işi tut
+  }
+});
 
 module.exports = { codeQueue, connection };
 
