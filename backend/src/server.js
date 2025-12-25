@@ -4,6 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const dns = require('dns');
+const net = require('net');
 const rateLimit = require('express-rate-limit');
 const { codeQueue, connection } = require('./worker/queue');
 const { QueueEvents } = require('bullmq');
@@ -113,6 +114,35 @@ app.get('/api/health', async (req, res) => {
     };
   }
 
+  // TCP connectivity check to DB host:port (helps distinguish reachability vs auth/SSL issues)
+  try {
+    const dbUrl = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
+    const host = dbUrl?.hostname;
+    const port = Number(dbUrl?.port || 5432);
+    if (!host) throw new Error('DATABASE_URL_NOT_SET');
+
+    out.db.tcp = await new Promise((resolve) => {
+      const socket = new net.Socket();
+      const started = Date.now();
+      const timeoutMs = 6000;
+
+      const done = (result) => {
+        try { socket.destroy(); } catch (_) {}
+        resolve({ ...result, host, port, ms: Date.now() - started });
+      };
+
+      socket.setTimeout(timeoutMs);
+      socket.once('connect', () => done({ ok: true }));
+      socket.once('timeout', () => done({ ok: false, error: 'TIMEOUT' }));
+      socket.once('error', (err) => done({ ok: false, error: err?.code || err?.name || 'TCP_ERROR' }));
+
+      socket.connect(port, host);
+    });
+  } catch (e) {
+    out.ok = false;
+    out.db.tcp = { ok: false, error: e?.message || e?.code || 'TCP_CHECK_FAILED' };
+  }
+
   try {
     // Lazy import to avoid circular deps; prisma client is a singleton in ../lib/prisma
     const prisma = require('./lib/prisma');
@@ -131,7 +161,7 @@ app.get('/api/health', async (req, res) => {
       name: e?.name || 'DB_ERROR',
       code: e?.code || e?.errorCode || undefined,
       // Keep message short and avoid leaking anything sensitive
-      message: (msgLines[0] || e?.toString?.() || '').slice(0, 300),
+      message: msgLines.slice(0, 4).join(' | ').slice(0, 500) || (e?.toString?.() || '').slice(0, 500),
     };
     console.error('[HEALTH][DB]', out.db.error);
   }
