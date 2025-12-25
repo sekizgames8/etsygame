@@ -11,14 +11,31 @@ const codeRoutes = require('./routes/code'); // To trigger the job
 
 const app = express();
 const server = http.createServer(app);
+
+// Configure CORS for Express
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://www.sekizgames.com",
+    "https://sekizgames.com"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all for dev, restrict in prod
-    methods: ["GET", "POST"]
+    origin: [
+      "http://localhost:3000",
+      "https://www.sekizgames.com",
+      "https://sekizgames.com"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-app.use(cors());
 app.use(express.json());
 
 // Routes
