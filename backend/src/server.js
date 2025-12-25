@@ -6,8 +6,9 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const { codeQueue, connection } = require('./worker/queue');
 const { QueueEvents } = require('bullmq');
-
-// ... imports ...
+const authRoutes = require('./routes/auth');
+const adminRoutes = require('./routes/admin');
+const codeRoutes = require('./routes/code');
 
 const app = express();
 const server = http.createServer(app);
