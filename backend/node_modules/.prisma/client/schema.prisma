@@ -6,9 +6,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Çevre değişkeninde sorun yaşadığın için bağlantı adresini doğrudan buraya yazıyoruz.
-  // İleride istersen tekrar env("DATABASE_URL") yapabilirsin.
-  url      = "postgresql://neondb_owner:npg_9xS5WbsjVUPE@ep-ancient-thunder-agkipirh-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+  url      = env("DATABASE_URL")
 }
 
 model User {
