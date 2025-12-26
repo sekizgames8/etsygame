@@ -70,6 +70,10 @@ const dictionaries: Record<Lang, Dict> = {
     "help.forbidden.item4": "Do NOT attempt to recover or transfer account ownership.",
     "help.security.title": "Security Notice",
     "help.security.desc": "Our system monitors all login attempts. Any attempt to add authenticator or change security settings will be detected and blocked automatically. Violators will lose access to all games.",
+
+    "history.title": "Request History",
+    "history.empty": "You don't have any past requests yet.",
+    "history.completed": "Completed",
   },
   ru: {
     "login.title": "sekizgames",
@@ -135,6 +139,10 @@ const dictionaries: Record<Lang, Dict> = {
     "help.forbidden.item4": "НЕ пытайтесь восстановить или передать право собственности на аккаунт.",
     "help.security.title": "Уведомление о безопасности",
     "help.security.desc": "Наша система отслеживает все попытки входа. Любая попытка добавить аутентификатор или изменить настройки безопасности будет обнаружена и заблокирована автоматически. Нарушители потеряют доступ ко всем играм.",
+
+    "history.title": "История запросов",
+    "history.empty": "У вас пока нет запросов.",
+    "history.completed": "Завершено",
   },
   ar: {
     "login.title": "sekizgames",
@@ -200,6 +208,10 @@ const dictionaries: Record<Lang, Dict> = {
     "help.forbidden.item4": "لا تحاول استعادة أو نقل ملكية الحساب.",
     "help.security.title": "إشعار الأمان",
     "help.security.desc": "يراقب نظامنا جميع محاولات تسجيل الدخول. سيتم اكتشاف أي محاولة لإضافة مصادق أو تغيير إعدادات الأمان وحظرها تلقائياً. سيفقد المخالفون الوصول إلى جميع الألعاب.",
+
+    "history.title": "سجل الطلبات",
+    "history.empty": "ليس لديك أي طلبات سابقة بعد.",
+    "history.completed": "مكتمل",
   },
 };
 

@@ -10,7 +10,7 @@ import { useLang } from "@/lib/lang";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Store, Library, History, X, LogOut, Gamepad2, ChevronRight, Menu, User, HelpCircle, CheckCircle, XCircle, AlertTriangle, Shield } from "lucide-react";
 import { format } from "date-fns";
-import { tr } from "date-fns/locale";
+import { tr, enUS, ar, ru } from "date-fns/locale";
 
 interface Game {
   gameId: string;
@@ -57,7 +57,10 @@ export default function Dashboard() {
   const [showHelp, setShowHelp] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const { t } = useLang();
+  const { t, lang } = useLang();
+
+  // Tarih formatı için locale
+  const dateLocale = lang === 'ar' ? ar : lang === 'ru' ? ru : lang === 'en' ? enUS : tr;
 
   // Get owned game IDs for checking in store view
   const ownedGameIds = new Set(myGames.map(g => g.gameId));
@@ -525,7 +528,7 @@ export default function Dashboard() {
             <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <History className="w-5 h-5 text-cyan-400" />
-                <h2 className="text-lg sm:text-xl font-bold text-white">İstek Geçmişi</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-white">{t("history.title")}</h2>
               </div>
               <button
                 onClick={() => setShowHistory(false)}
@@ -536,7 +539,7 @@ export default function Dashboard() {
             </div>
             <div className="overflow-y-auto p-4 sm:p-6">
               {history.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">Henüz geçmiş isteğiniz bulunmuyor.</p>
+                <p className="text-center text-gray-400 py-8">{t("history.empty")}</p>
               ) : (
                 <div className="space-y-3">
                   {history.map((req) => (
@@ -544,11 +547,11 @@ export default function Dashboard() {
                       <div className="min-w-0 flex-1">
                         <h3 className="font-semibold text-white text-sm sm:text-base truncate">{req.game.title}</h3>
                         <p className="text-xs text-gray-400 mt-1">
-                          {format(new Date(req.createdAt), "d MMMM yyyy HH:mm", { locale: tr })}
+                          {format(new Date(req.createdAt), "d MMMM yyyy HH:mm", { locale: dateLocale })}
                         </p>
                       </div>
                       <span className="text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-3 flex-shrink-0">
-                        Tamamlandı
+                        {t("history.completed")}
                       </span>
                     </div>
                   ))}
