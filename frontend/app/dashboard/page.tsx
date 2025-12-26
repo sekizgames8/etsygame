@@ -8,7 +8,7 @@ import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { useLang } from "@/lib/lang";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Store, Library, History, X, LogOut, Gamepad2, ChevronRight, Menu, User } from "lucide-react";
+import { Store, Library, History, X, LogOut, Gamepad2, ChevronRight, Menu, User, HelpCircle, CheckCircle, XCircle, AlertTriangle, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { tr } from "date-fns/locale";
 
@@ -53,6 +53,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('store');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const { t } = useLang();
@@ -240,6 +241,16 @@ export default function Dashboard() {
           >
             <History className="w-5 h-5 text-gray-500 group-hover:text-gray-300" />
             <span className="font-medium">{t("nav.history")}</span>
+          </button>
+
+          <div className="my-4 border-t border-white/5" />
+
+          <button
+            onClick={() => { setShowHelp(true); setSidebarOpen(false); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-200 group"
+          >
+            <HelpCircle className="w-5 h-5 text-gray-500 group-hover:text-gray-300" />
+            <span className="font-medium">{t("nav.help")}</span>
           </button>
         </nav>
 
@@ -517,6 +528,112 @@ export default function Dashboard() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm">
+          <div className="bg-[#12151f] border-t sm:border border-white/10 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-3xl max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-2xl">
+            <div className="p-4 sm:p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <HelpCircle className="w-5 h-5 text-cyan-400" />
+                <h2 className="text-lg sm:text-xl font-bold text-white">{t("help.title")}</h2>
+              </div>
+              <button
+                onClick={() => setShowHelp(false)}
+                className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-lg"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="overflow-y-auto p-4 sm:p-6 space-y-6">
+              {/* Nasıl Kullanılır */}
+              <div className="space-y-3">
+                <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  {t("help.howto.title")}
+                </h3>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                    <span className="text-emerald-400 font-bold">1.</span>
+                    <p>{t("help.howto.step1")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                    <span className="text-emerald-400 font-bold">2.</span>
+                    <p>{t("help.howto.step2")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                    <span className="text-emerald-400 font-bold">3.</span>
+                    <p>{t("help.howto.step3")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                    <span className="text-emerald-400 font-bold">4.</span>
+                    <p>{t("help.howto.step4")}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Uyarılar */}
+              <div className="space-y-3">
+                <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  {t("help.warnings.title")}
+                </h3>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.warnings.item1")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.warnings.item2")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.warnings.item3")}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Yasaklar */}
+              <div className="space-y-3">
+                <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                  <XCircle className="w-5 h-5 text-red-400" />
+                  {t("help.forbidden.title")}
+                </h3>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.forbidden.item1")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.forbidden.item2")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.forbidden.item3")}</p>
+                  </div>
+                  <div className="flex gap-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
+                    <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                    <p>{t("help.forbidden.item4")}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Güvenlik Notu */}
+              <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-white mb-1">{t("help.security.title")}</h4>
+                    <p className="text-sm text-gray-300">{t("help.security.desc")}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
