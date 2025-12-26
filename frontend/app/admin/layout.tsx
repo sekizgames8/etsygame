@@ -26,6 +26,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { href: "/admin", label: "Genel Bakış", icon: LayoutDashboard },
     { href: "/admin/system", label: "Sistem Sağlığı", icon: Activity },
     { href: "/admin/history", label: "İstek Geçmişi", icon: History },
+    { href: "/admin/test", label: "TEST LINK", icon: Activity }, // DEBUG
     { href: "/admin/users", label: "Kullanıcılar", icon: Users },
     { href: "/admin/games", label: "Oyunlar", icon: Gamepad2 },
     { href: "/admin/game-owners", label: "Oyun Sahiplikleri", icon: Search },
