@@ -8,6 +8,9 @@ import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { useLang } from "@/lib/lang";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { History, X } from "lucide-react";
+import { format } from "date-fns";
+import { tr } from "date-fns/locale";
 
 interface Game {
   gameId: string;
@@ -24,10 +27,20 @@ interface GameStatus {
   };
 }
 
+interface RequestHistory {
+  id: string;
+  createdAt: string;
+  game: {
+    title: string;
+  };
+}
+
 export default function Dashboard() {
   const [games, setGames] = useState<Game[]>([]);
   const [statuses, setStatuses] = useState<GameStatus>({});
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<RequestHistory[]>([]);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const { t } = useLang();
@@ -79,6 +92,19 @@ export default function Dashboard() {
     };
   }, [router]);
 
+  const fetchHistory = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`${API_BASE_URL}/api/code/history`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setHistory(res.data);
+      setShowHistory(true);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleSendCode = async (gameId: string) => {
     try {
       const token = localStorage.getItem("token");
@@ -119,6 +145,14 @@ export default function Dashboard() {
           </span>
           <Button
             variant="secondary"
+            onClick={fetchHistory}
+            className="flex items-center gap-2"
+          >
+            <History size={16} />
+            Geçmiş
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => {
               localStorage.clear();
               router.push("/");
@@ -128,6 +162,44 @@ export default function Dashboard() {
           </Button>
         </div>
       </header>
+
+      {/* History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#1a1f2e] border border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white">İstek Geçmişi</h2>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="overflow-y-auto p-6">
+              {history.length === 0 ? (
+                <p className="text-center text-gray-400 py-8">Henüz geçmiş isteğiniz bulunmuyor.</p>
+              ) : (
+                <div className="space-y-4">
+                  {history.map((req) => (
+                    <div key={req.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div>
+                        <h3 className="font-semibold text-white">{req.game.title}</h3>
+                        <p className="text-xs text-gray-400">
+                          {format(new Date(req.createdAt), "d MMMM yyyy HH:mm", { locale: tr })}
+                        </p>
+                      </div>
+                      <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                        Tamamlandı
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="w-full max-w-6xl">
         {games.length === 0 ? (
@@ -155,4 +227,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
