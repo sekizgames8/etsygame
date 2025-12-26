@@ -77,13 +77,17 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow CORS
 }));
 
-// Rate Limiter
+// Rate Limiter - More lenient for authenticated users
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 200, // Limit each IP to 200 requests per windowMs (increased for admin panel)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: 'Too many requests from this IP, please try again after 15 minutes',
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/api/health';
+  }
 });
 
 // Apply rate limiting to all requests
