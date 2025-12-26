@@ -7,7 +7,7 @@ type Dict = Record<string, string>;
 
 const dictionaries: Record<Lang, Dict> = {
   en: {
-    "login.title": "SteamGuard",
+    "login.title": "sekizgames",
     "login.subtitle": "Secure Code Delivery",
     "login.email": "Email Address",
     "login.password": "Password",
@@ -48,7 +48,7 @@ const dictionaries: Record<Lang, Dict> = {
     "btn.newCode": "Get New Code",
   },
   ru: {
-    "login.title": "SteamGuard",
+    "login.title": "sekizgames",
     "login.subtitle": "Безопасная доставка кодов",
     "login.email": "E-mail",
     "login.password": "Пароль",
@@ -89,7 +89,7 @@ const dictionaries: Record<Lang, Dict> = {
     "btn.newCode": "Получить новый код",
   },
   ar: {
-    "login.title": "SteamGuard",
+    "login.title": "sekizgames",
     "login.subtitle": "تسليم آمن لرموز Steam",
     "login.email": "البريد الإلكتروني",
     "login.password": "كلمة المرور",

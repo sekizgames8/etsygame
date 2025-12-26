@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SteamGuard Portal",
-  description: "Real-time Steam Guard code delivery dashboard",
+  title: "sekizgames",
+  description: "Game library and Steam Guard code delivery",
 };
 
 export default function RootLayout({

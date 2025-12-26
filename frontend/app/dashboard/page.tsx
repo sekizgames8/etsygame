@@ -163,8 +163,8 @@ export default function Dashboard() {
               <Gamepad2 className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white tracking-tight">SteamGuard</h1>
-              <p className="text-[10px] text-gray-500 uppercase tracking-widest">Portal</p>
+              <h1 className="text-lg font-bold text-white tracking-tight">sekizgames</h1>
+              <p className="text-[10px] text-gray-500 uppercase tracking-widest">Game Library</p>
             </div>
           </div>
         </div>

@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40 backdrop-blur-xl">
         <div>
           <h1 className="text-lg font-semibold text-white">Yönetim Paneli</h1>
-          <p className="text-xs text-gray-400">SteamGuard Admin</p>
+          <p className="text-xs text-gray-400">sekizgames Admin</p>
         </div>
         <button
           onClick={() => setMobileOpen((v) => !v)}
