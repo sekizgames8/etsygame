@@ -28,7 +28,7 @@ interface StoreGame {
 
 interface GameStatus {
   [gameId: string]: {
-    status: 'IDLE' | 'QUEUED' | 'PROCESSING' | 'WAITING_MAIL' | 'DONE' | 'ERROR' | 'LIMIT';
+    status: 'IDLE' | 'QUEUED' | 'PROCESSING' | 'WAITING_MAIL' | 'DONE' | 'ERROR' | 'LIMIT' | 'SECURITY_BLOCK' | 'SECURITY_UNKNOWN';
     code?: string;
   };
 }

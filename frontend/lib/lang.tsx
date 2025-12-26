@@ -35,17 +35,21 @@ const dictionaries: Record<Lang, Dict> = {
     "status.DONE": "READY",
     "status.ERROR": "ERROR",
     "status.LIMIT": "LIMIT",
+    "status.SECURITY": "BLOCKED",
 
     "status.msg.WAITING_MAIL": "Waiting for Steam email...",
     "status.msg.PROCESSING": "Signing in to Steam...",
     "status.msg.ERROR": "Failed to get code. Try again.",
     "status.msg.LIMIT": "You can request a Steam Guard code for this game only once per week.",
+    "status.msg.SECURITY_BLOCK": "⚠️ Security Alert! Steam Guard authenticator change detected. Code blocked for account protection.",
+    "status.msg.SECURITY_UNKNOWN": "⚠️ Suspicious activity detected. Code blocked for security reasons.",
 
     "code.label": "Steam Guard Code",
     "account.label": "Account:",
     "password.label": "Password:",
     "btn.send": "Send Code",
     "btn.newCode": "Get New Code",
+    "btn.blocked": "Blocked",
   },
   ru: {
     "login.title": "sekizgames",
@@ -76,17 +80,21 @@ const dictionaries: Record<Lang, Dict> = {
     "status.DONE": "ГОТОВО",
     "status.ERROR": "ОШИБКА",
     "status.LIMIT": "ЛИМИТ",
+    "status.SECURITY": "ЗАБЛОКИРОВАНО",
 
     "status.msg.WAITING_MAIL": "Ожидаем письмо от Steam...",
     "status.msg.PROCESSING": "Выполняется вход в Steam...",
     "status.msg.ERROR": "Не удалось получить код. Попробуйте ещё раз.",
     "status.msg.LIMIT": "Для этой игры можно запросить код Steam Guard только один раз в неделю.",
+    "status.msg.SECURITY_BLOCK": "⚠️ Обнаружена попытка изменения Steam Guard. Код заблокирован для защиты аккаунта.",
+    "status.msg.SECURITY_UNKNOWN": "⚠️ Обнаружена подозрительная активность. Код заблокирован по соображениям безопасности.",
 
     "code.label": "Код Steam Guard",
     "account.label": "Аккаунт:",
     "password.label": "Пароль:",
     "btn.send": "Отправить код",
     "btn.newCode": "Получить новый код",
+    "btn.blocked": "Заблокировано",
   },
   ar: {
     "login.title": "sekizgames",
@@ -117,17 +125,21 @@ const dictionaries: Record<Lang, Dict> = {
     "status.DONE": "جاهز",
     "status.ERROR": "خطأ",
     "status.LIMIT": "حد",
+    "status.SECURITY": "محظور",
 
     "status.msg.WAITING_MAIL": "بانتظار رسالة Steam...",
     "status.msg.PROCESSING": "يتم تسجيل الدخول إلى Steam...",
     "status.msg.ERROR": "تعذر الحصول على الرمز. حاول مرة أخرى.",
     "status.msg.LIMIT": "يمكنك طلب رمز Steam Guard لهذه اللعبة مرة واحدة في الأسبوع فقط.",
+    "status.msg.SECURITY_BLOCK": "⚠️ تم اكتشاف محاولة تغيير Steam Guard. تم حظر الرمز لحماية الحساب.",
+    "status.msg.SECURITY_UNKNOWN": "⚠️ تم اكتشاف نشاط مشبوه. تم حظر الرمز لأسباب أمنية.",
 
     "code.label": "رمز Steam Guard",
     "account.label": "الحساب:",
     "password.label": "كلمة المرور:",
     "btn.send": "إرسال الرمز",
     "btn.newCode": "الحصول على رمز جديد",
+    "btn.blocked": "محظور",
   },
 };
 

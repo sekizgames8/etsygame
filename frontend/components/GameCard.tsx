@@ -1,6 +1,7 @@
 import { Button } from "./ui/Button";
 import { useLang } from "@/lib/lang";
 import { useState } from "react";
+import { ShieldAlert, ShieldX } from "lucide-react";
 
 interface GameCardProps {
   id: string;
@@ -9,12 +10,13 @@ interface GameCardProps {
   steamUsername: string;
   steamPassword?: string;
   onSendCode: (id: string) => void;
-  status: 'IDLE' | 'QUEUED' | 'PROCESSING' | 'WAITING_MAIL' | 'DONE' | 'ERROR' | 'LIMIT';
+  status: 'IDLE' | 'QUEUED' | 'PROCESSING' | 'WAITING_MAIL' | 'DONE' | 'ERROR' | 'LIMIT' | 'SECURITY_BLOCK' | 'SECURITY_UNKNOWN';
   code?: string;
 }
 
 export const GameCard = ({ id, title, coverImage, steamUsername, steamPassword, onSendCode, status, code }: GameCardProps) => {
   const isLoading = status === 'QUEUED' || status === 'PROCESSING' || status === 'WAITING_MAIL';
+  const isSecurityIssue = status === 'SECURITY_BLOCK' || status === 'SECURITY_UNKNOWN';
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
 
@@ -43,13 +45,19 @@ export const GameCard = ({ id, title, coverImage, steamUsername, steamPassword, 
 
         {/* Status pill */}
         {status !== "IDLE" && (
-          <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/70 border border-white/10 text-[10px] font-medium uppercase tracking-[0.16em] text-gray-200 flex items-center gap-1">
+          <div className={`absolute top-2 left-2 px-2 py-1 rounded-full border text-[10px] font-medium uppercase tracking-[0.16em] flex items-center gap-1 ${
+            isSecurityIssue 
+              ? 'bg-red-900/90 border-red-500/50 text-red-200' 
+              : 'bg-black/70 border-white/10 text-gray-200'
+          }`}>
             <span
               className={
                 status === "DONE"
                   ? "w-1.5 h-1.5 rounded-full bg-emerald-400"
                   : status === "ERROR" || status === "LIMIT"
                   ? "w-1.5 h-1.5 rounded-full bg-red-400"
+                  : isSecurityIssue
+                  ? "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"
                   : "w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse"
               }
             />
@@ -59,6 +67,8 @@ export const GameCard = ({ id, title, coverImage, steamUsername, steamPassword, 
             {status === "DONE" && t("status.DONE")}
             {status === "ERROR" && t("status.ERROR")}
             {status === "LIMIT" && t("status.LIMIT")}
+            {status === "SECURITY_BLOCK" && t("status.SECURITY")}
+            {status === "SECURITY_UNKNOWN" && t("status.SECURITY")}
           </div>
         )}
 
@@ -95,6 +105,19 @@ export const GameCard = ({ id, title, coverImage, steamUsername, steamPassword, 
       </div>
 
       <div className="mt-3 space-y-2 w-full">
+        {/* Security Warning Box */}
+        {isSecurityIssue && (
+          <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-3 py-3 text-center">
+            <ShieldAlert className="w-6 h-6 text-red-400 mx-auto mb-2" />
+            <p className="text-[11px] text-red-300 font-medium">
+              {status === 'SECURITY_BLOCK' 
+                ? t("status.msg.SECURITY_BLOCK")
+                : t("status.msg.SECURITY_UNKNOWN")
+              }
+            </p>
+          </div>
+        )}
+
         <div className="rounded-xl bg-black/40 border border-white/10 px-3 py-2 text-[11px] text-gray-200 flex flex-col gap-0.5">
           <div>
             <span className="text-gray-400 mr-1">{t("account.label")}</span>
@@ -131,13 +154,13 @@ export const GameCard = ({ id, title, coverImage, steamUsername, steamPassword, 
         <Button
           onClick={() => onSendCode(id)}
           isLoading={isLoading}
+          disabled={isSecurityIssue}
           className="w-full text-sm py-2.5"
-          variant={status === "DONE" ? "secondary" : "primary"}
+          variant={status === "DONE" ? "secondary" : isSecurityIssue ? "secondary" : "primary"}
         >
-          {status === "DONE" ? t("btn.newCode") : t("btn.send")}
+          {isSecurityIssue ? t("btn.blocked") : status === "DONE" ? t("btn.newCode") : t("btn.send")}
         </Button>
       </div>
     </div>
   );
 };
-

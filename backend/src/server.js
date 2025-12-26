@@ -268,11 +268,18 @@ queueEvents.on('failed', async ({ jobId, failedReason }) => {
   console.error(`Job ${jobId} failed: ${failedReason}`);
 
   try {
-    // Look up the job to get its data, including userId and gameId
     const job = await codeQueue.getJob(jobId);
     if (job && job.data && job.data.userId) {
+      // Güvenlik bloğu kontrolü
+      let status = 'ERROR';
+      if (failedReason?.includes('SECURITY_BLOCK:AUTHENTICATOR_ATTEMPT')) {
+        status = 'SECURITY_BLOCK';
+      } else if (failedReason?.includes('SECURITY_BLOCK:UNKNOWN_EMAIL_TYPE')) {
+        status = 'SECURITY_UNKNOWN';
+      }
+      
       io.to(`user_${job.data.userId}`).emit('code_status', {
-        status: 'ERROR',
+        status,
         gameId: job.data.gameId,
       });
     }
