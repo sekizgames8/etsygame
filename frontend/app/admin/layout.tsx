@@ -79,18 +79,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-64 bg-black/20 backdrop-blur-lg border-r border-white/10 p-6 flex-col">
+      <aside className="hidden lg:flex w-64 bg-black/20 backdrop-blur-lg border-r border-white/10 p-6 flex-col fixed h-screen top-0 left-0 z-20">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
             Yönetim Paneli
           </h2>
         </div>
 
-        <nav className="flex-1 space-y-2">{renderLinks()}</nav>
+        <nav className="flex-1 space-y-2 overflow-y-auto">{renderLinks()}</nav>
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors mt-4 flex-shrink-0"
         >
           <LogOut size={20} />
           <span>Çıkış Yap</span>
@@ -133,7 +133,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       )}
 
       {/* Main content */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto lg:ml-64">{children}</main>
     </div>
   );
 }
