@@ -6,10 +6,10 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "worker": "node src/worker/index.js",
-    "build": "prisma generate && prisma db push",
-    "postinstall": "prisma generate",
-    "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push",
+    "build": "npx prisma generate && npx prisma db push",
+    "postinstall": "npx prisma generate",
+    "prisma:generate": "npx prisma generate",
+    "prisma:push": "npx prisma db push",
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
