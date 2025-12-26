@@ -105,45 +105,71 @@ export default function AssignmentsPage() {
               ))}
             </select>
           </div>
-          <div className="flex-1 space-y-2">
+// This file is being updated to implement a custom dropdown with images.
+// I'll replace the AssignmentsPage component logic for the account selection part.
+
+          <div className="flex-1 space-y-2 relative">
             <label className="text-sm text-gray-400">Hesap</label>
+            
+            {/* Custom Dropdown */}
             <div className="relative">
-              <select
-                className="w-full p-2 rounded bg-white/5 border border-white/10 text-white appearance-none"
-                value={assignData.steamAccountId}
-                onChange={(e) =>
-                  setAssignData({
-                    ...assignData,
-                    steamAccountId: e.target.value,
-                  })
-                }
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById("account-dropdown");
+                  if (el) el.classList.toggle("hidden");
+                }}
+                className="w-full p-2 rounded bg-white/5 border border-white/10 text-white text-left flex items-center justify-between"
               >
-                <option value="" className="text-black">
-                  Hesap Seç
-                </option>
-                {data.accounts.map((a) => (
-                  <option
-                    key={a.id}
-                    value={a.id}
-                    className="text-black"
-                  >
-                    {a.game?.title} - {a.username}
-                  </option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                <span className="truncate">
+                  {assignData.steamAccountId
+                    ? (() => {
+                        const acc = data.accounts.find(a => a.id === assignData.steamAccountId);
+                        return acc ? `${acc.game?.title} - ${acc.username}` : "Hesap Seç";
+                      })()
+                    : "Hesap Seç"}
+                </span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                 </svg>
+              </button>
+
+              <div 
+                id="account-dropdown" 
+                className="hidden absolute z-50 w-full mt-1 bg-[#1a1f2e] border border-white/10 rounded-lg shadow-xl max-h-60 overflow-y-auto"
+              >
+                {data.accounts.map((a) => (
+                  <div
+                    key={a.id}
+                    onClick={() => {
+                      setAssignData({ ...assignData, steamAccountId: a.id });
+                      document.getElementById("account-dropdown")?.classList.add("hidden");
+                    }}
+                    className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0"
+                  >
+                    <img 
+                      src={a.game?.coverImage || "https://placehold.co/40x60"} 
+                      alt={a.game?.title} 
+                      className="w-8 h-10 object-cover rounded"
+                    />
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="text-sm text-white font-medium truncate">{a.game?.title}</span>
+                      <span className="text-xs text-gray-400 truncate">{a.username}</span>
+                    </div>
+                  </div>
+                ))}
+                {data.accounts.length === 0 && (
+                  <div className="p-3 text-gray-500 text-sm text-center">Hesap bulunamadı</div>
+                )}
               </div>
             </div>
-            {/* Custom visualizer for selected account if needed, but select with images is tricky.
-                Instead, we show the image of the selected account below if selected. */}
+
+            {/* Selected Account Preview */}
             {assignData.steamAccountId && (() => {
               const selectedAccount = data.accounts.find(a => a.id === assignData.steamAccountId);
               if (selectedAccount && selectedAccount.game?.coverImage) {
                 return (
-                  <div className="mt-2 flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                  <div className="mt-2 flex items-center gap-3 p-2 bg-white/5 rounded-lg border border-white/10">
                     <img 
                       src={selectedAccount.game.coverImage} 
                       alt={selectedAccount.game.title} 
