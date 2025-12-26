@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node ./node_modules/prisma/build/index.js generate && node ./node_modules/prisma/build/index.js db push && node src/server.js",
     "dev": "nodemon src/server.js",
-    "worker": "node src/worker/index.js",
+    "worker": "node ./node_modules/prisma/build/index.js generate && node src/worker/index.js",
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
     "seed": "node prisma/seed.js"
