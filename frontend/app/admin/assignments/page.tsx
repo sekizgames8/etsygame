@@ -105,9 +105,6 @@ export default function AssignmentsPage() {
               ))}
             </select>
           </div>
-// This file is being updated to implement a custom dropdown with images.
-// I'll replace the AssignmentsPage component logic for the account selection part.
-
           <div className="flex-1 space-y-2 relative">
             <label className="text-sm text-gray-400">Hesap</label>
             
