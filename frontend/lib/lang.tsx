@@ -19,6 +19,15 @@ const dictionaries: Record<Lang, Dict> = {
     "dashboard.welcome": "Welcome",
     "dashboard.logout": "Logout",
     "dashboard.empty": "No games assigned to you yet.",
+    
+    "nav.store": "Store",
+    "nav.library": "Library",
+    "nav.history": "History",
+    "store.title": "Game Store",
+    "store.subtitle": "Browse all available games",
+    "store.empty": "No games available yet.",
+    "store.owned": "Owned",
+    "library.empty": "You don't own any games yet. Visit the Store to see available games.",
 
     "status.QUEUED": "QUEUED",
     "status.PROCESSING": "LOGGING IN",
@@ -51,6 +60,15 @@ const dictionaries: Record<Lang, Dict> = {
     "dashboard.welcome": "Привет",
     "dashboard.logout": "Выйти",
     "dashboard.empty": "У вас пока нет привязанных игр.",
+    
+    "nav.store": "Магазин",
+    "nav.library": "Библиотека",
+    "nav.history": "История",
+    "store.title": "Магазин игр",
+    "store.subtitle": "Просмотр всех доступных игр",
+    "store.empty": "Пока нет доступных игр.",
+    "store.owned": "В библиотеке",
+    "library.empty": "У вас пока нет игр. Посетите Магазин, чтобы увидеть доступные игры.",
 
     "status.QUEUED": "В ОЧЕРЕДИ",
     "status.PROCESSING": "ВХОД В STEAM",
@@ -83,6 +101,15 @@ const dictionaries: Record<Lang, Dict> = {
     "dashboard.welcome": "مرحباً",
     "dashboard.logout": "تسجيل الخروج",
     "dashboard.empty": "لا توجد ألعاب مضافة إلى حسابك بعد.",
+    
+    "nav.store": "المتجر",
+    "nav.library": "المكتبة",
+    "nav.history": "السجل",
+    "store.title": "متجر الألعاب",
+    "store.subtitle": "تصفح جميع الألعاب المتاحة",
+    "store.empty": "لا توجد ألعاب متاحة بعد.",
+    "store.owned": "مملوكة",
+    "library.empty": "لا تملك أي ألعاب بعد. قم بزيارة المتجر لرؤية الألعاب المتاحة.",
 
     "status.QUEUED": "في الانتظار",
     "status.PROCESSING": "تسجيل الدخول",

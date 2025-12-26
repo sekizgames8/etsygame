@@ -120,6 +120,26 @@ router.post('/users', async (req, res) => {
   }
 });
 
+// Delete User
+router.delete('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    // 1. Delete code requests
+    await prisma.codeRequest.deleteMany({ where: { userId: id } });
+    
+    // 2. Delete assignments
+    await prisma.assignment.deleteMany({ where: { userId: id } });
+    
+    // 3. Delete user
+    await prisma.user.delete({ where: { id } });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user.' });
+  }
+});
+
 // Create Game
 router.post('/games', async (req, res) => {
   const { title, coverImage } = req.body;

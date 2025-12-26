@@ -84,6 +84,18 @@ router.post('/request', verifyToken, async (req, res) => {
   }
 });
 
+// Get all available games (public for logged in users)
+router.get('/all-games', verifyToken, async (req, res) => {
+  try {
+    const games = await prisma.game.findMany({
+      orderBy: { title: 'asc' }
+    });
+    res.json(games);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get games for user
 router.get('/my-games', verifyToken, async (req, res) => {
   try {
