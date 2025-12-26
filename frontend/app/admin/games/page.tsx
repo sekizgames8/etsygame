@@ -2,13 +2,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/Button";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, ExternalLink } from "lucide-react";
 import { API_BASE_URL } from "@/lib/utils";
 
 export default function GamesPage() {
   const [games, setGames] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ title: "", coverImage: "" });
+  const [formData, setFormData] = useState({ title: "", coverImage: "", listingUrl: "" });
   const [editingGame, setEditingGame] = useState<any | null>(null);
 
   const fetchGames = async () => {
@@ -42,7 +42,7 @@ export default function GamesPage() {
       }
       setShowForm(false);
       setEditingGame(null);
-      setFormData({ title: "", coverImage: "" });
+      setFormData({ title: "", coverImage: "", listingUrl: "" });
       fetchGames();
     } catch (e) { console.error(e); }
   };
@@ -76,7 +76,7 @@ export default function GamesPage() {
           onClick={() => {
             if (editingGame) {
               setEditingGame(null);
-              setFormData({ title: "", coverImage: "" });
+              setFormData({ title: "", coverImage: "", listingUrl: "" });
             }
             setShowForm(!showForm);
           }}
@@ -104,6 +104,14 @@ export default function GamesPage() {
                 setFormData({ ...formData, coverImage: e.target.value })
               }
             />
+            <input
+              placeholder="İlan Linki (Etsy, Web sitesi vb.)"
+              className="p-3 rounded-xl bg-black/30 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/70 md:col-span-2"
+              value={formData.listingUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, listingUrl: e.target.value })
+              }
+            />
             <div className="md:col-span-2">
               <Button type="submit" className="w-full md:w-auto">
                 {editingGame ? "Güncelle" : "Oluştur"}
@@ -115,15 +123,26 @@ export default function GamesPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {games.map((game) => (
-          <button
+          <div
             key={game.id}
-            type="button"
             className={`flex flex-col group cursor-pointer text-left ${
               editingGame?.id === game.id ? "scale-[1.03]" : ""
             } transition-transform`}
           >
             <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-zinc-900 shadow-lg shadow-black/40">
               <div className="absolute top-2 right-2 z-10 flex gap-1">
+                {game.listingUrl && (
+                  <a
+                    href={game.listingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-black/70 text-gray-200 hover:text-cyan-300 hover:bg-black/90 transition-colors"
+                    title="İlan Linki"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                )}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -132,6 +151,7 @@ export default function GamesPage() {
                     setFormData({
                       title: game.title ?? "",
                       coverImage: game.coverImage ?? "",
+                      listingUrl: game.listingUrl ?? "",
                     });
                     setShowForm(true);
                   }}
@@ -156,18 +176,23 @@ export default function GamesPage() {
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+              
+              {/* Listing URL indicator */}
+              {game.listingUrl && (
+                <div className="absolute bottom-2 left-2 px-2 py-1 rounded-lg bg-cyan-500/20 border border-cyan-500/30 text-[10px] text-cyan-300 flex items-center gap-1">
+                  <ExternalLink size={10} />
+                  İlan Bağlı
+                </div>
+              )}
             </div>
             <div className="mt-2">
               <h3 className="text-sm font-medium text-white line-clamp-2">
                 {game.title}
               </h3>
             </div>
-          </button>
+          </div>
         ))}
       </div>
-
-      {/* Kullanıcı listesi yeni sayfaya taşındı (/admin/game-owners) */}
     </div>
   );
 }
-

@@ -24,6 +24,7 @@ interface StoreGame {
   id: string;
   title: string;
   coverImage: string;
+  listingUrl?: string;
 }
 
 interface GameStatus {
@@ -338,8 +339,19 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
                   {allGames.map((game) => {
                     const isOwned = ownedGameIds.has(game.id);
+                    const GameWrapper = game.listingUrl ? 'a' : 'div';
+                    const wrapperProps = game.listingUrl ? {
+                      href: game.listingUrl,
+                      target: "_blank",
+                      rel: "noopener noreferrer"
+                    } : {};
+                    
                     return (
-                      <div key={game.id} className="group relative">
+                      <GameWrapper 
+                        key={game.id} 
+                        className={`group relative block ${game.listingUrl ? 'cursor-pointer' : ''}`}
+                        {...wrapperProps}
+                      >
                         <div className="relative aspect-[2/3] overflow-hidden rounded-lg sm:rounded-xl bg-gradient-to-br from-slate-100/10 via-slate-700/5 to-transparent p-[1px] shadow-[0_10px_25px_rgba(0,0,0,0.4)] sm:shadow-[0_15px_35px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:scale-[1.02]">
                           <div className="relative w-full h-full rounded-lg sm:rounded-xl overflow-hidden bg-zinc-950">
                             <img 
@@ -356,15 +368,29 @@ export default function Dashboard() {
                               </div>
                             )}
                             
+                            {/* External Link indicator */}
+                            {game.listingUrl && !isOwned && (
+                              <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-cyan-500/90 flex items-center justify-center text-white shadow-lg group-hover:bg-cyan-400 transition-colors">
+                                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                              </div>
+                            )}
+                            
                             {/* Title overlay */}
                             <div className="absolute inset-x-0 bottom-0 p-2 sm:p-3">
                               <h3 className="text-xs sm:text-sm font-semibold text-white line-clamp-2">
                                 {game.title}
                               </h3>
+                              {game.listingUrl && (
+                                <p className="text-[10px] text-cyan-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {t("store.clickToBuy")}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </GameWrapper>
                     );
                   })}
                 </div>

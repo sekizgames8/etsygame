@@ -28,6 +28,7 @@ const dictionaries: Record<Lang, Dict> = {
     "store.subtitle": "Browse all available games",
     "store.empty": "No games available yet.",
     "store.owned": "Owned",
+    "store.clickToBuy": "Click to buy →",
     "library.empty": "You don't own any games yet. Visit the Store to see available games.",
 
     "status.QUEUED": "QUEUED",
@@ -92,6 +93,7 @@ const dictionaries: Record<Lang, Dict> = {
     "store.subtitle": "Просмотр всех доступных игр",
     "store.empty": "Пока нет доступных игр.",
     "store.owned": "В библиотеке",
+    "store.clickToBuy": "Нажмите, чтобы купить →",
     "library.empty": "У вас пока нет игр. Посетите Магазин, чтобы увидеть доступные игры.",
 
     "status.QUEUED": "В ОЧЕРЕДИ",
@@ -156,6 +158,7 @@ const dictionaries: Record<Lang, Dict> = {
     "store.subtitle": "تصفح جميع الألعاب المتاحة",
     "store.empty": "لا توجد ألعاب متاحة بعد.",
     "store.owned": "مملوكة",
+    "store.clickToBuy": "انقر للشراء ←",
     "library.empty": "لا تملك أي ألعاب بعد. قم بزيارة المتجر لرؤية الألعاب المتاحة.",
 
     "status.QUEUED": "في الانتظار",

@@ -142,7 +142,7 @@ router.delete('/users/:id', async (req, res) => {
 
 // Create Game
 router.post('/games', async (req, res) => {
-  const { title, coverImage } = req.body;
+  const { title, coverImage, listingUrl } = req.body;
   
   if (!title || typeof title !== 'string' || title.trim().length === 0) {
     return res.status(400).json({ error: 'Title is required and must be a non-empty string.' });
@@ -156,7 +156,8 @@ router.post('/games', async (req, res) => {
     const game = await prisma.game.create({
       data: { 
         title: title.trim(), 
-        coverImage: coverImage?.trim() || `https://placehold.co/300x450?text=${encodeURIComponent(title.trim())}`
+        coverImage: coverImage?.trim() || `https://placehold.co/300x450?text=${encodeURIComponent(title.trim())}`,
+        listingUrl: listingUrl?.trim() || null
       }
     });
     res.json(game);
@@ -169,11 +170,15 @@ router.post('/games', async (req, res) => {
 // Update Game
 router.put('/games/:id', async (req, res) => {
   const { id } = req.params;
-  const { title, coverImage } = req.body;
+  const { title, coverImage, listingUrl } = req.body;
   try {
     const game = await prisma.game.update({
       where: { id },
-      data: { title, coverImage },
+      data: { 
+        title, 
+        coverImage,
+        listingUrl: listingUrl || null
+      },
     });
     res.json(game);
   } catch (error) {
