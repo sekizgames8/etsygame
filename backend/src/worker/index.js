@@ -18,16 +18,19 @@ console.log("GMAIL_CLIENT_SECRET set:", GMAIL_CLIENT_SECRET !== "PASTE_GOOGLE_CL
 async function fetchCodeFromGmail(auth, targetEmail, retries = 5) {
   const gmail = google.gmail({ version: 'v1', auth });
 
+  console.log("DEBUG - Searching for Steam Guard email to:", targetEmail);
+
   for (let i = 0; i < retries; i++) {
+    console.log(`DEBUG - Attempt ${i + 1}/${retries}`);
     try {
       const res = await gmail.users.messages.list({
         userId: 'me',
         // Steam'den gelen son birkaç maili ara
-        // (to: filtresi bazı durumlarda Gmail aramasında sorun çıkarabildiği için
-        //  burada sadece from ile daraltıyoruz, eşleştirmeyi aşağıda kendimiz yapıyoruz)
-        q: `from:noreply@steampowered.com is:unread subject:"Steam Guard"`,
-        maxResults: 1,
+        q: `from:noreply@steampowered.com is:unread`,
+        maxResults: 5,
       });
+
+      console.log("DEBUG - Found messages:", res.data.messages?.length || 0);
 
       if (res.data.messages && res.data.messages.length > 0) {
         // Gelen son birkaç Steam maili içinde hedef e‑posta adresine (alias) gönderilmiş olanı bul
@@ -41,18 +44,30 @@ async function fetchCodeFromGmail(auth, targetEmail, retries = 5) {
             headers.find((h) => h.name?.toLowerCase() === 'to')?.value || '';
           const deliveredToHeader =
             headers.find((h) => h.name?.toLowerCase() === 'delivered-to')?.value || '';
+          const subjectHeader =
+            headers.find((h) => h.name?.toLowerCase() === 'subject')?.value || '';
+
+          console.log("DEBUG - Email subject:", subjectHeader);
+          console.log("DEBUG - Email to:", toHeader);
+          console.log("DEBUG - Email delivered-to:", deliveredToHeader);
 
           const normalizedTarget = (targetEmail || '').trim().toLowerCase();
           const combinedHeaders = `${toHeader} ${deliveredToHeader}`.toLowerCase();
 
+          console.log("DEBUG - Looking for:", normalizedTarget);
+          console.log("DEBUG - Match found:", combinedHeaders.includes(normalizedTarget));
+
           // Hedef alias, mailin To/Delivered-To alanlarından birinde geçmiyorsa bu maili atla
           if (!normalizedTarget || !combinedHeaders.includes(normalizedTarget)) {
+            console.log("DEBUG - Skipping email, target not matched");
             continue;
           }
 
           // Body içinden kodu bulmaya çalışalım (snippet yerine tam body daha güvenli).
           const parts = payload.parts || [];
           let bodyText = msg.data.snippet || "";
+
+          console.log("DEBUG - Snippet:", bodyText.substring(0, 100));
 
           for (const part of parts) {
             if (part.mimeType === 'text/plain' && part.body?.data) {
@@ -62,9 +77,24 @@ async function fetchCodeFromGmail(auth, targetEmail, retries = 5) {
             }
           }
 
+          console.log("DEBUG - Body (first 200 chars):", bodyText.substring(0, 200));
+
           // Örnek metinlerde genelde 5 haneli kod geçer.
           const match = bodyText.match(/([A-Z0-9]{5})/);
+          console.log("DEBUG - Code match:", match ? match[1] : "NO MATCH");
+          
           if (match) {
+            // Mail'i okundu olarak işaretle
+            try {
+              await gmail.users.messages.modify({
+                userId: 'me',
+                id: m.id,
+                requestBody: { removeLabelIds: ['UNREAD'] }
+              });
+              console.log("DEBUG - Marked email as read");
+            } catch (e) {
+              console.log("DEBUG - Could not mark as read:", e.message);
+            }
             return match[1];
           }
         }
@@ -93,7 +123,17 @@ const worker = new Worker(
     // Buradaki token artık bir REFRESH TOKEN olmalı.
     // OAuth Playground Step 2'den aldığın REFRESH TOKEN değerini admin panelindeki
     // "Gmail Refresh Token" alanına yapıştırmalısın.
-    const token = decrypt(encryptedGmailToken);
+    console.log("DEBUG - Encrypted token (first 50 chars):", encryptedGmailToken?.substring(0, 50));
+    
+    let token;
+    try {
+      token = decrypt(encryptedGmailToken);
+      console.log("DEBUG - Decrypted token (first 20 chars):", token?.substring(0, 20));
+      console.log("DEBUG - Token starts with '1//':", token?.startsWith('1//'));
+    } catch (decryptErr) {
+      console.error("DEBUG - Decrypt failed:", decryptErr.message);
+      throw new Error("Token decrypt failed: " + decryptErr.message);
+    }
 
     const oAuth2Client = new google.auth.OAuth2(
       GMAIL_CLIENT_ID,
@@ -101,6 +141,8 @@ const worker = new Worker(
     );
     // Refresh token veriyoruz; googleapis ihtiyaç halinde access token'ı yeniliyor.
     oAuth2Client.setCredentials({ refresh_token: token });
+    
+    console.log("DEBUG - Gmail email target:", gmailEmail);
 
     // Müşteri zaten Steam'i kendi açıyor, biz sadece mailden kod okuyacağız.
     job.updateProgress({
