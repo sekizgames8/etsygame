@@ -101,12 +101,10 @@ export default function Dashboard() {
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
-      console.log("Connected to socket");
       newSocket.emit("join_user", userData.id);
     });
 
     newSocket.on("code_status", (data: { status: string, gameId: string, code?: string }) => {
-      console.log("Status update:", data);
       setStatuses(prev => ({
         ...prev,
         [data.gameId]: {

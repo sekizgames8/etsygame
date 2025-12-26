@@ -221,15 +221,8 @@ app.use('/api/code', codeRoutes);
 
 // Socket.IO
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  
   socket.on('join_user', (userId) => {
     socket.join(`user_${userId}`);
-    console.log(`Socket ${socket.id} joined user_${userId}`);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('User disconnected:', socket.id);
   });
 });
 
@@ -243,8 +236,6 @@ app.use((req, res, next) => {
 const queueEvents = new QueueEvents('steam-codes', { connection });
 
 queueEvents.on('completed', ({ jobId, returnvalue }) => {
-  console.log(`Job ${jobId} completed! Result: ${JSON.stringify(returnvalue)}`);
-  // returnvalue should contain { userId, code, gameId }
   if (returnvalue && returnvalue.userId) {
     io.to(`user_${returnvalue.userId}`).emit('code_status', {
       status: 'DONE',
@@ -265,7 +256,6 @@ queueEvents.on('progress', ({ jobId, data }) => {
 });
 
 queueEvents.on('failed', async ({ jobId, failedReason }) => {
-  console.error(`Job ${jobId} failed: ${failedReason}`);
 
   try {
     const job = await codeQueue.getJob(jobId);

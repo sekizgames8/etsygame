@@ -3,11 +3,13 @@ const { google } = require('googleapis');
 const { decrypt } = require('../lib/crypto');
 const { connection } = require('./queue');
 
-const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID || "1048686874524-eb3126g1fc55h5rria4pidev06jlbjfl.apps.googleusercontent.com";
-const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET || "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";
+const GMAIL_CLIENT_ID = process.env.GMAIL_CLIENT_ID;
+const GMAIL_CLIENT_SECRET = process.env.GMAIL_CLIENT_SECRET;
 
-console.log("GMAIL_CLIENT_ID:", GMAIL_CLIENT_ID.slice(0, 10) || "<empty>");
-console.log("GMAIL_CLIENT_SECRET set:", GMAIL_CLIENT_SECRET !== "PASTE_GOOGLE_CLIENT_SECRET_HERE");
+if (!GMAIL_CLIENT_ID || !GMAIL_CLIENT_SECRET) {
+  console.error("FATAL: GMAIL_CLIENT_ID or GMAIL_CLIENT_SECRET not set!");
+  process.exit(1);
+}
 
 // ⚠️ GÜVENLIK: Steam Guard Authenticator ekleme girişimini tespit et
 // Bu kelimeler mailde geçerse KOD GÖSTERİLMEZ - hesap çalma girişimi olabilir!
@@ -175,7 +177,6 @@ async function fetchCodeFromGmail(auth, targetEmail, retries = 5) {
               });
             } catch (e) {}
             
-            console.log("✅ Login code found safely");
             return match[1];
           }
         }
@@ -236,12 +237,9 @@ const worker = new Worker(
   { connection }
 );
 
-worker.on('completed', (job) => {
-  console.log(`Job ${job.id} completed`);
-});
-
 worker.on('failed', (job, err) => {
-  console.log(`Job ${job.id} failed: ${err.message}`);
+  // Sadece güvenlik uyarıları logla
+  if (err.message?.includes('SECURITY_BLOCK')) {
+    console.warn(`🚨 Security block: Job ${job.id} - ${err.message}`);
+  }
 });
-
-console.log("Worker started...");
