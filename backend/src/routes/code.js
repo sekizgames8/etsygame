@@ -128,6 +128,9 @@ router.get('/my-games', verifyToken, async (req, res) => {
       };
     });
 
+    // Alfabetik sırala
+    games.sort((a, b) => a.title.localeCompare(b.title));
+
     res.json(games);
   } catch (error) {
     res.status(500).json({ error: error.message });

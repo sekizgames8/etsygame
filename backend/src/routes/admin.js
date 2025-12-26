@@ -320,9 +320,12 @@ router.patch('/users/:id/active', async (req, res) => {
 // Get All Data (Simplified for dashboard)
 router.get('/dashboard-data', async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
-    const games = await prisma.game.findMany();
-    const accounts = await prisma.steamAccount.findMany({ include: { game: true } });
+    const users = await prisma.user.findMany({ orderBy: { name: 'asc' } });
+    const games = await prisma.game.findMany({ orderBy: { title: 'asc' } });
+    const accounts = await prisma.steamAccount.findMany({ 
+      include: { game: true },
+      orderBy: { game: { title: 'asc' } }
+    });
     const assignments = await prisma.assignment.findMany({
       include: {
         user: true,
@@ -340,7 +343,7 @@ router.get('/steam-accounts-detail', async (req, res) => {
   try {
     const accounts = await prisma.steamAccount.findMany({
       include: { game: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { game: { title: 'asc' } },
     });
 
     const safeAccounts = accounts.map((acc) => ({
