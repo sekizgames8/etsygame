@@ -15,6 +15,7 @@ export default function AccountsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState({ username: "", gmailEmail: "", password: "", refreshToken: "" });
   const [showEditPassword, setShowEditPassword] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -70,6 +71,19 @@ export default function AccountsPage() {
     }
   };
 
+  const filteredAccounts = data.accounts.filter(acc => {
+    const searchLower = searchTerm.toLowerCase();
+    const gameTitle = acc.gameTitle ?? acc.game?.title ?? "";
+    const username = acc.username ?? "";
+    const gmail = acc.gmailEmail ?? "";
+    
+    return (
+      gameTitle.toLowerCase().includes(searchLower) ||
+      username.toLowerCase().includes(searchLower) ||
+      gmail.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="space-y-8">
       
@@ -78,6 +92,17 @@ export default function AccountsPage() {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold text-white">Steam Hesapları</h1>
           <Button onClick={() => setShowForm(!showForm)}>+ Yeni Hesap</Button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Ara: Oyun adı, kullanıcı adı veya gmail..."
+            className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-colors"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {showForm && (
@@ -142,7 +167,7 @@ export default function AccountsPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.accounts.map(acc => (
+                {filteredAccounts.map(acc => (
                   <tr key={acc.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="px-4 py-2 text-white whitespace-nowrap">
                       {acc.gameTitle ?? acc.game?.title}
@@ -245,10 +270,10 @@ export default function AccountsPage() {
                     </td>
                   </tr>
                 ))}
-                {data.accounts.length === 0 && (
+                {filteredAccounts.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-4 py-4 text-center text-sm text-gray-400">
-                      Kayıtlı Steam hesabı bulunamadı.
+                      {searchTerm ? "Arama sonucu bulunamadı." : "Kayıtlı Steam hesabı bulunamadı."}
                     </td>
                   </tr>
                 )}

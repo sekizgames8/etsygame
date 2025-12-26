@@ -107,29 +107,57 @@ export default function AssignmentsPage() {
           </div>
           <div className="flex-1 space-y-2">
             <label className="text-sm text-gray-400">Hesap</label>
-            <select
-              className="w-full p-2 rounded bg-white/5 border border-white/10 text-white"
-              value={assignData.steamAccountId}
-              onChange={(e) =>
-                setAssignData({
-                  ...assignData,
-                  steamAccountId: e.target.value,
-                })
-              }
-            >
-              <option value="" className="text-black">
-                Hesap Seç
-              </option>
-              {data.accounts.map((a) => (
-                <option
-                  key={a.id}
-                  value={a.id}
-                  className="text-black"
-                >
-                  {a.username} - {a.game?.title}
+            <div className="relative">
+              <select
+                className="w-full p-2 rounded bg-white/5 border border-white/10 text-white appearance-none"
+                value={assignData.steamAccountId}
+                onChange={(e) =>
+                  setAssignData({
+                    ...assignData,
+                    steamAccountId: e.target.value,
+                  })
+                }
+              >
+                <option value="" className="text-black">
+                  Hesap Seç
                 </option>
-              ))}
-            </select>
+                {data.accounts.map((a) => (
+                  <option
+                    key={a.id}
+                    value={a.id}
+                    className="text-black"
+                  >
+                    {a.game?.title} - {a.username}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+            {/* Custom visualizer for selected account if needed, but select with images is tricky.
+                Instead, we show the image of the selected account below if selected. */}
+            {assignData.steamAccountId && (() => {
+              const selectedAccount = data.accounts.find(a => a.id === assignData.steamAccountId);
+              if (selectedAccount && selectedAccount.game?.coverImage) {
+                return (
+                  <div className="mt-2 flex items-center gap-3 p-2 bg-white/5 rounded-lg">
+                    <img 
+                      src={selectedAccount.game.coverImage} 
+                      alt={selectedAccount.game.title} 
+                      className="w-10 h-14 object-cover rounded"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold text-white">{selectedAccount.game.title}</p>
+                      <p className="text-xs text-gray-400">{selectedAccount.username}</p>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
           <Button type="submit" isLoading={loading}>
             Ata

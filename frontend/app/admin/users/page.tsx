@@ -5,6 +5,8 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { API_BASE_URL } from "@/lib/utils";
 
+import { Trash2 } from "lucide-react";
+
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -45,6 +47,24 @@ export default function UsersPage() {
       fetchUsers();
     } catch (e) {
       console.error(e);
+    }
+  };
+
+// This file is being updated. The search_replace tool requires an exact string match.
+// I'll rewrite the entire handleDelete function and the return block to ensure it matches.
+
+  const handleDelete = async (userId: string) => {
+    if (!window.confirm("Bu kullanıcıyı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.")) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`${API_BASE_URL}/api/admin/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchUsers();
+    } catch (e) {
+      console.error(e);
+      alert("Kullanıcı silinirken bir hata oluştu.");
     }
   };
 
@@ -130,13 +150,22 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <Button
-                      variant={user.isActive ? "secondary" : "primary"}
-                      className="text-xs px-3 py-1.5"
-                      onClick={() => toggleActive(user.id, user.isActive)}
-                    >
-                      {user.isActive ? "Pasifleştir" : "Aktifleştir"}
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant={user.isActive ? "secondary" : "primary"}
+                        className="text-xs px-3 py-1.5"
+                        onClick={() => toggleActive(user.id, user.isActive)}
+                      >
+                        {user.isActive ? "Pasifleştir" : "Aktifleştir"}
+                      </Button>
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-md transition-colors"
+                        title="Kullanıcıyı Sil"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
