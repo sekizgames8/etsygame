@@ -74,7 +74,7 @@ export default function AssignmentsPage() {
         </p>
       </div>
 
-      <GlassCard className="p-6">
+      <GlassCard className="p-6 overflow-visible relative z-20">
         <h2 className="text-lg font-semibold text-white mb-4">
           Yeni Atama Oluştur
         </h2>
