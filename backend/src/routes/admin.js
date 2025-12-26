@@ -9,6 +9,72 @@ const isAdmin = require('../middleware/admin');
 router.use(verifyToken);
 router.use(isAdmin);
 
+const { connection } = require('../worker/queue');
+
+// System Status Endpoint
+router.get('/system-status', async (req, res) => {
+  try {
+    const uptime = process.uptime();
+    const memory = process.memoryUsage();
+    
+    // DB Check
+    const startDb = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    const dbLatency = Date.now() - startDb;
+
+    // Redis Check
+    const startRedis = Date.now();
+    await connection.ping();
+    const redisLatency = Date.now() - startRedis;
+    
+    res.json({
+      uptime,
+      memory,
+      dbLatency,
+      redisLatency,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Request History Endpoint (Admin)
+router.get('/history', async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+
+  try {
+    const total = await prisma.codeRequest.count();
+    const requests = await prisma.codeRequest.findMany({
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { name: true, email: true }
+        },
+        game: {
+          select: { title: true }
+        }
+      }
+    });
+
+    res.json({
+      requests,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Create User
 router.post('/users', async (req, res) => {
   const { email, password, name, role, isActive } = req.body;

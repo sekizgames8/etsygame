@@ -122,5 +122,23 @@ router.get('/my-games', verifyToken, async (req, res) => {
   }
 });
 
+// User Request History
+router.get('/history', verifyToken, async (req, res) => {
+  try {
+    const requests = await prisma.codeRequest.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        game: {
+          select: { title: true }
+        }
+      }
+    });
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
 
