@@ -16,6 +16,10 @@ const codeRoutes = require('./routes/code');
 const app = express();
 const server = http.createServer(app);
 
+// 🔒 GÜVENLIK: Proxy arkasında çalışıyoruz (Render, Railway vb.)
+// Bu ayar olmadan rate limiter IP adreslerini doğru tanımlayamaz!
+app.set('trust proxy', 1);
+
 function safeLogConnectionInfo() {
   try {
     const dbUrl = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : null;
@@ -77,17 +81,39 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow CORS
 }));
 
-// Rate Limiter - More lenient for authenticated users
+// Rate Limiter - Saldırı koruması
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Limit each IP to 200 requests per windowMs (increased for admin panel)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: 'Too many requests from this IP, please try again after 15 minutes',
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 100, // Her IP için 15 dakikada maksimum 100 istek
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
   skip: (req) => {
-    // Skip rate limiting for health checks
     return req.path === '/api/health';
+  },
+  handler: (req, res, next, options) => {
+    // 🚨 Rate limit aşıldığında logla
+    console.warn(`🚨 RATE LIMIT EXCEEDED: IP=${req.ip} Path=${req.path} Method=${req.method}`);
+    res.status(options.statusCode).json(options.message);
+  },
+  // Proxy arkasında doğru IP'yi al
+  keyGenerator: (req) => {
+    return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
   }
+});
+
+// Daha sıkı limiter - Hassas endpoint'ler için (login, kod isteme)
+const strictLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 dakika
+  max: 10, // 5 dakikada maksimum 10 istek
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts. Please wait 5 minutes.' },
+  handler: (req, res, next, options) => {
+    console.warn(`🚨 STRICT RATE LIMIT: IP=${req.ip} Path=${req.path}`);
+    res.status(options.statusCode).json(options.message);
+  },
+  keyGenerator: (req) => req.ip || 'unknown'
 });
 
 // Apply rate limiting to all requests
@@ -214,10 +240,10 @@ app.get('/api/health', async (req, res) => {
   res.status(out.ok ? 200 : 503).json(out);
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
+// Routes - Hassas endpoint'lere ekstra rate limiting
+app.use('/api/auth', strictLimiter, authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/code', codeRoutes);
+app.use('/api/code', strictLimiter, codeRoutes);
 
 // Socket.IO
 io.on('connection', (socket) => {
