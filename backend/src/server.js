@@ -16,7 +16,14 @@ const codeRoutes = require('./routes/code');
 const app = express();
 const server = http.createServer(app);
 
-app.set('trust proxy', 1);
+app.set('trust proxy', true);
+
+const getClientIp = (req) => {
+  return req.headers['cf-connecting-ip'] || 
+         req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
+         req.ip || 
+         'unknown';
+};
 
 function safeLogConnectionInfo() {
   try {
@@ -83,16 +90,12 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests from this IP, please try again after 15 minutes' },
-  skip: (req) => {
-    return req.path === '/api/health';
-  },
+  skip: (req) => req.path === '/api/health',
   handler: (req, res, next, options) => {
-    console.warn(`RATE LIMIT EXCEEDED: IP=${req.ip} Path=${req.path} Method=${req.method}`);
+    console.warn(`RATE LIMIT: IP=${getClientIp(req)} Path=${req.path}`);
     res.status(options.statusCode).json(options.message);
   },
-  keyGenerator: (req) => {
-    return req.ip || req.headers['x-forwarded-for']?.split(',')[0] || 'unknown';
-  }
+  keyGenerator: (req) => getClientIp(req)
 });
 
 const strictLimiter = rateLimit({
@@ -102,10 +105,10 @@ const strictLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'Too many attempts. Please wait 5 minutes.' },
   handler: (req, res, next, options) => {
-    console.warn(`STRICT RATE LIMIT: IP=${req.ip} Path=${req.path}`);
+    console.warn(`STRICT LIMIT: IP=${getClientIp(req)} Path=${req.path}`);
     res.status(options.statusCode).json(options.message);
   },
-  keyGenerator: (req) => req.ip || 'unknown'
+  keyGenerator: (req) => getClientIp(req)
 });
 
 app.use(limiter);
